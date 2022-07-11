@@ -41,6 +41,7 @@ dependencies:
   intl: ^0.17.0
   shared_preferences: ^2.0.15
   firebase_core: ^1.19.1
+  safeprint: ^0.0.2
 
 dev_dependencies:
   flutter_test:
