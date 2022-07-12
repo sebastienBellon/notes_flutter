@@ -13,18 +13,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(
     this._authRepository,
   ) : super(Unauthenticated()) {
-    on<AuthEvent>((event, emit) {
+    on<AuthEvent>((event, emit) async {
       if (event is AppStarted) {
-        _appStartedTrigger(emit);
+        await _appStartedTrigger(emit);
       } else if (event is Login) {
-        _loginTrigger(emit);
+        await _loginTrigger(emit);
       } else if (event is Logout) {
-        _logoutTrigger(emit);
+        await _logoutTrigger(emit);
       }
     });
   }
 
-  void _appStartedTrigger(
+  Future<void> _appStartedTrigger(
     Emitter<AuthState> emit,
   ) async {
     try {
@@ -43,7 +43,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _loginTrigger(
+  Future<void> _loginTrigger(
     Emitter<AuthState> emit,
   ) async {
     try {
@@ -55,7 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _logoutTrigger(
+  Future<void> _logoutTrigger(
     Emitter<AuthState> emit,
   ) async {
     try {

@@ -19,20 +19,20 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     this._authRepository,
     this._noteRepository,
   ) : super(NotesInitial()) {
-    on<NotesEvent>((event, emit) {
+    on<NotesEvent>((event, emit) async {
       if (event is FetchNotes) {
-        _fetchTrigger(emit);
+        await _fetchTrigger(emit);
       } else if (event is UpdateNotes) {
-        _updateTrigger(event.notes, emit);
+        await _updateTrigger(event.notes, emit);
       }
     });
   }
 
-  void _fetchTrigger(Emitter<NotesState> emit) async {
+  Future<void> _fetchTrigger(Emitter<NotesState> emit) async {
     emit(NotesLoading());
     try {
       final User? currentUser = await _authRepository.getCurrentUser();
-      _notesSubscription?.cancel();
+      await _notesSubscription?.cancel();
       _notesSubscription = _noteRepository
           .streamNotes(userId: currentUser!.id)
           .listen((notes) => add(UpdateNotes(notes: notes)));
@@ -42,13 +42,14 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     }
   }
 
-  void _updateTrigger(List<Note> notes, Emitter<NotesState> emit) {
+  Future<void> _updateTrigger(
+      List<Note> notes, Emitter<NotesState> emit) async {
     emit(NotesLoaded(notes));
   }
 
   @override
-  Future<void> close() {
-    _notesSubscription?.cancel();
+  Future<void> close() async {
+    await _notesSubscription?.cancel();
     return super.close();
   }
 }
