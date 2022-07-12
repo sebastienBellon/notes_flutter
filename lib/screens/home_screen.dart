@@ -2,22 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/blocs.dart';
+import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
+    // BlocConsumer is used here since we want to fetch notes
+    // when user is authenticated only -> call to method listener
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        context.read<NotesBloc>().add(FetchNotes());
+      },
+      builder: (context, authState) {
         return Scaffold(
-          body: _buildBody(context, state),
+          body: BlocBuilder<NotesBloc, NotesState>(
+            builder: (context, notesState) {
+              return _buildBody(context, authState, notesState);
+            },
+          ),
         );
       },
     );
   }
 
-  Stack _buildBody(BuildContext context, AuthState authState) {
+  Stack _buildBody(
+      BuildContext context, AuthState authState, NotesState notesState) {
     return Stack(
       children: [
         CustomScrollView(
@@ -42,9 +53,28 @@ class HomeScreen extends StatelessWidget {
                   icon: const Icon(Icons.brightness_4),
                 ),
               ],
-            )
+            ),
+            notesState is NotesLoaded
+                ? NotesGrid(
+                    onTap: (note) => print(note),
+                    notes: notesState.notes,
+                  )
+                : const SliverPadding(padding: EdgeInsets.zero),
           ],
         ),
+        notesState is NotesLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : const SizedBox.shrink(),
+        notesState is NotesError
+            ? const Center(
+                child: Text(
+                  'Something went wrong!\nPlease check your connection.',
+                  textAlign: TextAlign.center,
+                ),
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }
