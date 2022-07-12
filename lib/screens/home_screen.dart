@@ -59,7 +59,9 @@ class HomeScreen extends StatelessWidget {
                     onTap: (note) => print(note),
                     notes: notesState.notes,
                   )
-                : const SliverPadding(padding: EdgeInsets.zero),
+                : const SliverPadding(
+                    // mandatory to return something for the slivers -> thus dummy sliver
+                    padding: EdgeInsets.zero),
           ],
         ),
         notesState is NotesLoading
