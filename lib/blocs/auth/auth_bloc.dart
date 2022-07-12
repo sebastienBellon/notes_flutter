@@ -10,9 +10,9 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
-  AuthBloc(
-    this._authRepository,
-  ) : super(Unauthenticated()) {
+  AuthBloc({required AuthRepository authRepository})
+      : _authRepository = authRepository,
+        super(Unauthenticated()) {
     on<AuthEvent>((event, emit) async {
       if (event is AppStarted) {
         await _appStartedTrigger(emit);

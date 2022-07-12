@@ -12,13 +12,15 @@ part 'notes_state.dart';
 
 class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final AuthRepository _authRepository;
-  final NotesRepository _noteRepository;
+  final NotesRepository _notesRepository;
   StreamSubscription? _notesSubscription;
 
-  NotesBloc(
-    this._authRepository,
-    this._noteRepository,
-  ) : super(NotesInitial()) {
+  NotesBloc({
+    required AuthRepository authRepository,
+    required NotesRepository notesRepository,
+  })  : _authRepository = authRepository,
+        _notesRepository = notesRepository,
+        super(NotesInitial()) {
     on<NotesEvent>((event, emit) async {
       if (event is FetchNotes) {
         await _fetchTrigger(emit);
@@ -33,7 +35,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     try {
       final User? currentUser = await _authRepository.getCurrentUser();
       await _notesSubscription?.cancel();
-      _notesSubscription = _noteRepository
+      _notesSubscription = _notesRepository
           .streamNotes(userId: currentUser!.id)
           .listen((notes) => add(UpdateNotes(notes: notes)));
     } catch (err) {

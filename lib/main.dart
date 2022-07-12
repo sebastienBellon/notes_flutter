@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:notes/repositories/auth/auth_repository.dart';
 
 import 'blocs/blocs.dart';
+import 'repositories/repositories.dart';
 import 'screens/screens.dart';
 
 void main() {
@@ -26,8 +26,14 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthBloc>(
           create: (_) => AuthBloc(
-            AuthRepository(),
+            authRepository: AuthRepository(),
           )..add(AppStarted()),
+        ),
+        BlocProvider<NotesBloc>(
+          create: (_) => NotesBloc(
+            authRepository: AuthRepository(),
+            notesRepository: NotesRepository(),
+          ),
         )
       ],
       child: MaterialApp(
